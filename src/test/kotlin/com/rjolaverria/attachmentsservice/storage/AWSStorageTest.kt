@@ -11,14 +11,14 @@ import aws.smithy.kotlin.runtime.content.ByteStream
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.UUID
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class AWSStorageTest {
 
@@ -41,7 +41,7 @@ class AWSStorageTest {
 
         val response = awsStorage.upload(filename, content)
 
-        assertTrue(response is StorageUploadResponse.Success)
+        assertTrue(response is StorageUploadResult.Success)
         assertEquals(filename, response.filename)
         assertNotNull(response.id)
 
@@ -67,7 +67,7 @@ class AWSStorageTest {
 
         val response = awsStorage.download(id)
 
-        assertTrue(response is StorageDownloadResponse.Success)
+        assertTrue(response is StorageDownloadResult.Success)
         assertContentEquals(content, response.content)
 
         coVerify(exactly = 1) { dynamoClient.getItem(any()) }
@@ -84,7 +84,7 @@ class AWSStorageTest {
 
         val response = awsStorage.download(id)
 
-        assertTrue(response is StorageDownloadResponse.NotFound)
+        assertTrue(response is StorageDownloadResult.NotFound)
 
         coVerify(exactly = 1) { dynamoClient.getItem(any()) }
         coVerify(exactly = 0) { s3Client.getObject(any(), any()) }
@@ -99,7 +99,7 @@ class AWSStorageTest {
 
         val response = awsStorage.upload(filename, content)
 
-        assertTrue(response is StorageUploadResponse.Error)
+        assertTrue(response is StorageUploadResult.Error)
 
         coVerify(exactly = 1) { s3Client.putObject(any()) }
         coVerify(exactly = 0) { dynamoClient.putItem(any()) }
@@ -115,7 +115,7 @@ class AWSStorageTest {
 
         val response = awsStorage.upload(filename, content)
 
-        assertTrue(response is StorageUploadResponse.Error)
+        assertTrue(response is StorageUploadResult.Error)
 
         coVerify(exactly = 1) { s3Client.putObject(any()) }
         coVerify(exactly = 1) { dynamoClient.putItem(any()) }

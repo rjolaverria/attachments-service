@@ -5,27 +5,22 @@ import java.util.UUID
 interface Storage {
     /**
      * Uploads a file to the storage
-     * @param filename the name of the file
-     * @param content the content of the file
-     * @return the URL of the file
      */
-    suspend fun upload(filename: String, content: ByteArray): StorageUploadResponse
+    suspend fun upload(filename: String, content: ByteArray): StorageUploadResult
 
     /**
      * Downloads a file from the storage
-     * @param filename the name of the file
-     * @return the content of the file
      */
-    suspend fun download(id: String): StorageDownloadResponse
+    suspend fun download(id: String): StorageDownloadResult
 }
 
-sealed class StorageUploadResponse {
-    data class Success(val filename: String, val id: UUID): StorageUploadResponse()
-    data class Error(val message: String): StorageUploadResponse()
+sealed class StorageUploadResult {
+    data class Success(val filename: String, val id: UUID): StorageUploadResult()
+    data class Error(val message: String): StorageUploadResult()
 }
 
-sealed class StorageDownloadResponse {
-    data class Success(val content: ByteArray): StorageDownloadResponse()
-    object NotFound: StorageDownloadResponse()
-    data class Error(val message: String): StorageDownloadResponse()
+sealed class StorageDownloadResult {
+    data class Success(val content: ByteArray): StorageDownloadResult()
+    data object NotFound: StorageDownloadResult()
+    data class Error(val message: String): StorageDownloadResult()
 }

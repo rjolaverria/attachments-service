@@ -1,13 +1,14 @@
 package com.rjolaverria.attachmentsservice.storage
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.UUID
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class LocalStorageTest {
 
@@ -38,13 +39,13 @@ class LocalStorageTest {
         val filename = "test.txt"
         val content = "Hello, world!".toByteArray()
 
-        val response = localStorage.upload(filename, content)
+        val result = localStorage.upload(filename, content)
 
-        assertTrue(response is StorageUploadResponse.Success)
-        val successResponse = response as StorageUploadResponse.Success
-        assertEquals(filename, successResponse.filename)
+        assertTrue(result is StorageUploadResult.Success)
+        val successResult = result as StorageUploadResult.Success
+        assertEquals(filename, successResult.filename)
 
-        val storedFile = File("$storageDir/${successResponse.id}-$filename")
+        val storedFile = File("$storageDir/${successResult.id}-$filename")
         assertTrue(storedFile.exists())
         assertArrayEquals(content, storedFile.readBytes())
     }
@@ -54,23 +55,23 @@ class LocalStorageTest {
         val filename = "test.txt"
         val content = "Hello, world!".toByteArray()
 
-        val uploadResponse = localStorage.upload(filename, content) as StorageUploadResponse.Success
-        val id = uploadResponse.id.toString()
+        val uploadResult = localStorage.upload(filename, content) as StorageUploadResult.Success
+        val id = uploadResult.id.toString()
 
-        val downloadResponse = localStorage.download(id)
+        val downloadResult = localStorage.download(id)
 
-        assertTrue(downloadResponse is StorageDownloadResponse.Success)
-        val successResponse = downloadResponse as StorageDownloadResponse.Success
-        assertArrayEquals(content, successResponse.content)
+        assertTrue(downloadResult is StorageDownloadResult.Success)
+        val successResult = downloadResult as StorageDownloadResult.Success
+        assertArrayEquals(content, successResult.content)
     }
 
     @Test
     fun `download should return NotFound if file does not exist`() = runTest {
         val nonExistentId = UUID.randomUUID().toString()
 
-        val downloadResponse = localStorage.download(nonExistentId)
+        val downloadResult = localStorage.download(nonExistentId)
 
-        assertTrue(downloadResponse is StorageDownloadResponse.NotFound)
+        assertTrue(downloadResult is StorageDownloadResult.NotFound)
     }
 
     @Test
@@ -80,8 +81,8 @@ class LocalStorageTest {
         val filename = "test.txt"
         val content = "Hello, world!".toByteArray()
 
-        val response = invalidStorage.upload(filename, content)
+        val result = invalidStorage.upload(filename, content)
 
-        assertTrue(response is StorageUploadResponse.Error)
+        assertTrue(result is StorageUploadResult.Error)
     }
 }

@@ -23,19 +23,19 @@ class AWSStorage(private val s3Client: S3Client, private val dynamoClient: Dynam
     private val s3bucketName = Env.s3BucketName
     private val dynamoTableName = Env.dynamoTableName
 
-    override suspend fun upload(filename: String, content: ByteArray): StorageUploadResponse {
-        val url = putObject(filename, content) ?: return StorageUploadResponse.Error("Error uploading file")
-        val id = putObjectKey(url) ?: return StorageUploadResponse.Error("Error uploading file")
-        return StorageUploadResponse.Success(filename, id)
+    override suspend fun upload(filename: String, content: ByteArray): StorageUploadResult {
+        val url = putObject(filename, content) ?: return StorageUploadResult.Error("Error uploading file")
+        val id = putObjectKey(url) ?: return StorageUploadResult.Error("Error uploading file")
+        return StorageUploadResult.Success(filename, id)
     }
 
-    override suspend fun download(id: String): StorageDownloadResponse {
-        val s3Key = getObjectKey(id) ?: return StorageDownloadResponse.NotFound
+    override suspend fun download(id: String): StorageDownloadResult {
+        val s3Key = getObjectKey(id) ?: return StorageDownloadResult.NotFound
         val bytes = getObject(s3Key)
         return if (bytes != null) {
-            StorageDownloadResponse.Success(bytes)
+            StorageDownloadResult.Success(bytes)
         } else {
-            StorageDownloadResponse.Error("Error downloading file")
+            StorageDownloadResult.Error("Error downloading file")
         }
     }
 

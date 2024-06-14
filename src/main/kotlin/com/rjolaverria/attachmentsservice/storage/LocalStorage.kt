@@ -15,30 +15,30 @@ class LocalStorage(private val storageDir: String) : Storage {
         }
     }
 
-    override suspend fun upload(filename: String, content: ByteArray): StorageUploadResponse {
+    override suspend fun upload(filename: String, content: ByteArray): StorageUploadResult {
         return withContext(Dispatchers.IO) {
             try {
                 val id = UUID.randomUUID()
                 val file = File("$storageDir/$id-$filename")
                 file.writeBytes(content)
-                StorageUploadResponse.Success(filename, id)
+                StorageUploadResult.Success(filename, id)
             } catch (e: IOException) {
-                StorageUploadResponse.Error(e.message ?: "Unknown error")
+                StorageUploadResult.Error(e.message ?: "Unknown error")
             }
         }
     }
 
-    override suspend fun download(id: String): StorageDownloadResponse {
+    override suspend fun download(id: String): StorageDownloadResult {
         return withContext(Dispatchers.IO) {
             try {
                 val file = File(storageDir).listFiles()?.find { it.name.startsWith(id) }
                 if (file != null && file.exists()) {
-                    StorageDownloadResponse.Success(file.readBytes())
+                    StorageDownloadResult.Success(file.readBytes())
                 } else {
-                    StorageDownloadResponse.NotFound
+                    StorageDownloadResult.NotFound
                 }
             } catch (e: IOException) {
-                StorageDownloadResponse.Error(e.message ?: "Unknown error")
+                StorageDownloadResult.Error(e.message ?: "Unknown error")
             }
         }
     }
