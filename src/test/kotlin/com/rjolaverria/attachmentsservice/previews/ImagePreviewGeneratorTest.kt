@@ -27,12 +27,12 @@ class ImagePreviewGeneratorTest {
         val imageBytes = convertImageToBytes(originalImage, "png")
         val scaledImageBytes = convertImageToBytes(createTestImage(200, 100), "png")
 
-        coEvery { imageScaler.scale(any<ByteArray>(), any<Int>()) } returns scaledImageBytes
+        coEvery { imageScaler.scale(any<ByteArray>(), any<Int>(), any<String>()) } returns scaledImageBytes
 
         val result = imagePreviewGenerator.generate(imageBytes)
 
-        assertArrayEquals(scaledImageBytes, result)
-        coVerify { imageScaler.scale(imageBytes, 200) }
+        assertArrayEquals(scaledImageBytes, result.content)
+        coVerify { imageScaler.scale(imageBytes, 200, "png") }
     }
 
     private fun createTestImage(width: Int, height: Int): BufferedImage {

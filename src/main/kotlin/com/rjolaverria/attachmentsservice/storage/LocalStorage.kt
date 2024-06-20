@@ -3,10 +3,14 @@ package com.rjolaverria.attachmentsservice.storage
 import java.io.File
 import java.io.IOException
 import java.util.UUID
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class LocalStorage(private val storageDir: String) : Storage {
+class LocalStorage(
+    private val storageDir: String,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : Storage {
 
     init {
         val dir = File(storageDir)
@@ -16,7 +20,7 @@ class LocalStorage(private val storageDir: String) : Storage {
     }
 
     override suspend fun upload(filename: String, content: ByteArray): StorageUploadResult {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher) {
             try {
                 val id = UUID.randomUUID()
                 val file = File("$storageDir/$id-$filename")
@@ -29,7 +33,7 @@ class LocalStorage(private val storageDir: String) : Storage {
     }
 
     override suspend fun download(id: String): StorageDownloadResult {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher) {
             try {
                 val file = File(storageDir).listFiles()?.find { it.name.startsWith(id) }
                 if (file != null && file.exists()) {

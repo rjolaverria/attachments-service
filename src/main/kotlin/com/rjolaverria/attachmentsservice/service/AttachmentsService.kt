@@ -5,6 +5,8 @@ import com.rjolaverria.attachmentsservice.previews.PreviewGeneratorFactory
 import com.rjolaverria.attachmentsservice.storage.StorageDownloadResult
 import com.rjolaverria.attachmentsservice.storage.StorageFactory
 import com.rjolaverria.attachmentsservice.storage.StorageUploadResult
+import org.apache.commons.compress.utils.FileNameUtils
+import org.apache.commons.io.FilenameUtils
 import org.apache.tika.Tika
 import org.springframework.stereotype.Service
 
@@ -27,10 +29,11 @@ class AttachmentsService {
 
 
     suspend fun put(filename: String, content: ByteArray): PutAttachmentResult {
+        val baseName = FilenameUtils.getBaseName(filename)
         val mimeType = tika.detect(content)
         val generator = previewGenerator.get(mimeType)
         val preview = generator?.generate(content)
-        val previewRes = preview?.let { storage.upload("preview-$filename", it) }
+        val previewRes = preview?.let { storage.upload("preview-$baseName.${it.fileExtension}", it.content) }
 
         val mainContent = if(imageScaler.isSupported(mimeType)) {
             imageScaler.scale(content, MAX_IMAGE_WIDTH)

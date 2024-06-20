@@ -4,6 +4,7 @@ val okhttpVersion = "5.0.0-alpha.14"
 val dotenvVersion = "0.0.2"
 val mockkVersion = "1.13.11"
 val tikaVersion = "2.9.2"
+val javacvVersion = "1.5.10"
 
 plugins {
     id("org.springframework.boot") version "3.3.0"
@@ -47,6 +48,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.apache.tika:tika-core:$tikaVersion")
     implementation("org.apache.tika:tika-parsers-standard-package:$tikaVersion")
+    implementation("org.bytedeco:javacv-platform:$javacvVersion")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.h2database:h2")

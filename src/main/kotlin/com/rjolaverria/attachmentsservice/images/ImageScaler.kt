@@ -15,10 +15,9 @@ class ImageScaler {
         return mimeType.startsWith("image/")
     }
 
-    fun scale(image: ByteArray, width: Int): ByteArray {
+    fun scale(image: ByteArray, width: Int, formatName: String = getFormatName(image)): ByteArray {
         val inputStream = ByteArrayInputStream(image)
         val bufferedImage = ImageIO.read(inputStream)
-        val formatName = getFormatName(image)
 
         if (bufferedImage.width <= width) return image
 
